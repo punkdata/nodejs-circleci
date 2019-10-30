@@ -59,3 +59,39 @@ typings/
 
 # next.js build output
 .next
+
+# ignore test results folder
+test-results/
+
+#Terraform Ignore file
+*.dll
+*.exe
+.DS_Store
+example.tf
+terraform.tfplan
+terraform.tfstate
+.terraform.tfstate.lock.info
+bin/
+modules-dev/
+/pkg/
+website/.vagrant
+website/.bundle
+website/build
+website/node_modules
+.vagrant/
+*.backup
+./*.tfstate
+.terraform/
+*.log
+*.bak
+*~
+.*.swp
+.idea
+*.iml
+*.test
+*.iml
+plan.txt
+website/vendor
+namecheap.tf
+cicd_demo_gcp_creds.json
+*.pyc
