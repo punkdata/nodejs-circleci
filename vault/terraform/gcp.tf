@@ -1,0 +1,21 @@
+resource "vault_gcp_secret_backend" "gcp" {
+  credentials               = file(var.credentials_file)
+  default_lease_ttl_seconds = 600
+  max_lease_ttl_seconds     = 1800
+}
+
+resource "vault_gcp_secret_roleset" "roleset" {
+  backend      = vault_gcp_secret_backend.gcp.path
+  roleset      = var.app
+  secret_type  = "access_token"
+  project      = data.google_project.project.project_id
+  token_scopes = ["https://www.googleapis.com/auth/cloud-platform"]
+
+  binding {
+    resource = "//cloudresourcemanager.googleapis.com/projects/${data.google_project.project.project_id}"
+
+    roles = [
+      "roles/container.developer",
+    ]
+  }
+}
