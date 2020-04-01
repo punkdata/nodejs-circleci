@@ -6,7 +6,7 @@ resource "vault_policy" "policy" {
   name = var.app
 
   policy = <<EOT
-path "gcp/key/${var.app}" {
+path "gcp/token/${var.app}" {
   capabilities = ["read"]
 }
 
