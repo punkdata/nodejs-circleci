@@ -3,8 +3,11 @@ version: 2.1
 jobs:
   kubeconfig:
     docker:
-      - image: joatmon08/circleci-gcp-agent:283.0-1.14.67
+      - image: joatmon08/circleci-gcp-agent:287.0-1.14.72
     steps:
+      - run:
+          name: Authenticate to Vault
+          command: echo "vault"
       - run:
           name: Authenticate to GCP
           command: |
