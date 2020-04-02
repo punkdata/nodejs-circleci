@@ -7,7 +7,7 @@ resource "vault_gcp_secret_backend" "gcp" {
 resource "vault_gcp_secret_roleset" "roleset" {
   backend      = vault_gcp_secret_backend.gcp.path
   roleset      = var.app
-  secret_type  = "access_token"
+  secret_type  = "service_account_key"
   project      = data.google_project.project.project_id
   token_scopes = ["https://www.googleapis.com/auth/cloud-platform"]
 
