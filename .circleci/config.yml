@@ -1,5 +1,21 @@
 version: 2.1
+
 jobs:
+  kubeconfig:
+    docker:
+      - image: joatmon08/circleci-gcp-agent:283.0-1.14.67
+    steps:
+      - run:
+          name: Authenticate to GCP
+          command: |
+            gcloud auth activate-service-account --key-file=/tmp/service-account
+            gcloud config set project $(cat /tmp/gcp-project)
+            gcloud container clusters get-credentials $(cat /tmp/kubernetes-cluster) --zone $(cat /tmp/kubernetes-cluster-zone)
+      - persist_to_workspace:
+          root: /root/.kube
+          paths:
+            - config
+
   run_tests:
     docker:
       - image: circleci/node:10
@@ -17,6 +33,7 @@ jobs:
           path: test-results
       - store_artifacts:
           path: test-results
+
 workflows:
   build_test:
     jobs:

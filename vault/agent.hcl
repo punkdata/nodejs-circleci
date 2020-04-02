@@ -18,9 +18,46 @@ auto_auth {
 
 template {
   contents = <<EOF
-    {{ with secret "gcp/token/nodejs-circleci" }}
-    {{ .Data.token }}
+    {{ with secret "gcp/key/nodejs-circleci" }}
+    {{ .Data.private_key_data }}
     {{ end }}
   EOF
-  destination = "/tmp/gcp-token"
+  destination = "/tmp/service-account"
+}
+
+template {
+  contents = <<EOF
+    {{ with secret "nodejs-circleci/kubernetes" }}
+    {{ .Data.project }}
+    {{ end }}
+  EOF
+  destination = "/tmp/gcp-project"
+}
+
+
+template {
+  contents = <<EOF
+    {{ with secret "nodejs-circleci/kubernetes" }}
+    {{ .Data.zone }}
+    {{ end }}
+  EOF
+  destination = "/tmp/kubernetes-cluster-zone"
+}
+
+template {
+  contents = <<EOF
+    {{ with secret "nodejs-circleci/kubernetes" }}
+    {{ .Data.cluster }}
+    {{ end }}
+  EOF
+  destination = "/tmp/kubernetes-cluster"
+}
+
+template {
+  contents = <<EOF
+    {{ with secret "nodejs-circleci/kubernetes" }}
+    {{ .Data.zone }}
+    {{ end }}
+  EOF
+  destination = "/tmp/kubernetes-cluster-zone"
 }
