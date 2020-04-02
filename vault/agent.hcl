@@ -37,7 +37,7 @@ template {
 
 template {
   contents = <<EOF
-    {{ with secret "nodejs-circleci/kubernetes" }}
+    {{ with secret "nodejs-circleci/pipeline/kubernetes" }}
     {{ .Data.zone }}
     {{ end }}
   EOF
@@ -46,7 +46,7 @@ template {
 
 template {
   contents = <<EOF
-    {{ with secret "nodejs-circleci/kubernetes" }}
+    {{ with secret "nodejs-circleci/pipeline/kubernetes" }}
     {{ .Data.cluster }}
     {{ end }}
   EOF
@@ -55,9 +55,20 @@ template {
 
 template {
   contents = <<EOF
-    {{ with secret "nodejs-circleci/kubernetes" }}
+    {{ with secret "nodejs-circleci/pipeline/kubernetes" }}
     {{ .Data.zone }}
     {{ end }}
   EOF
   destination = "/tmp/kubernetes-cluster-zone"
+}
+
+template {
+  contents = <<EOF
+    {{ with secret "nodejs-circleci/pipeline/tfc" }}
+    credentials "app.terraform.io" {
+      token = "{{ .Data.token }}"
+    }
+    {{ end }}
+  EOF
+  destination = "/root/.terraformrc"
 }
