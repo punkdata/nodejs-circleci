@@ -3,9 +3,9 @@ variable "app" {
   description = "name of app"
 }
 
-variable "credentials_file" {
+variable "gcp_credentials" {
   type        = string
-  description = "location of GCP credentials"
+  description = "GCP credentials for vault secret engine"
 }
 
 variable "kubernetes_cluster" {

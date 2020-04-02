@@ -1,5 +1,5 @@
 resource "vault_gcp_secret_backend" "gcp" {
-  credentials               = file(var.credentials_file)
+  credentials               = var.gcp_credentials
   default_lease_ttl_seconds = 600
   max_lease_ttl_seconds     = 1800
 }
