@@ -17,3 +17,8 @@ variable "kubernetes_cluster_zone" {
   type        = string
   description = "zone of cluster to target"
 }
+
+variable "terraform_cloud_token" {
+  type        = string
+  description = "API Token for Terraform Cloud"
+}

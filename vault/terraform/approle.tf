@@ -10,7 +10,7 @@ path "gcp/key/${var.app}" {
   capabilities = ["read"]
 }
 
-path "${var.app}/kubernetes" {
+path "${var.app}/pipeline" {
   capabilities = ["read"]
 }
 EOT
