@@ -26,59 +26,59 @@ template {
   destination = "vault/dockerhub"
 }
 
-template {
-  contents = <<EOF
-    {{ with secret "gcp/key/nodejs-circleci" }}
-    {{ .Data.private_key_data }}
-    {{ end }}
-  EOF
-  destination = "/tmp/service-account"
-}
+# template {
+#   contents = <<EOF
+#     {{ with secret "gcp/key/nodejs-circleci" }}
+#     {{ .Data.private_key_data }}
+#     {{ end }}
+#   EOF
+#   destination = "/tmp/service-account"
+# }
 
-template {
-  contents = <<EOF
-    {{ with secret "nodejs-circleci/kubernetes" }}
-    {{ .Data.project }}
-    {{ end }}
-  EOF
-  destination = "/tmp/gcp-project"
-}
+# template {
+#   contents = <<EOF
+#     {{ with secret "nodejs-circleci/kubernetes" }}
+#     {{ .Data.project }}
+#     {{ end }}
+#   EOF
+#   destination = "/tmp/gcp-project"
+# }
 
 
-template {
-  contents = <<EOF
-    {{ with secret "nodejs-circleci/pipeline/kubernetes" }}
-    {{ .Data.zone }}
-    {{ end }}
-  EOF
-  destination = "/tmp/kubernetes-cluster-zone"
-}
+# template {
+#   contents = <<EOF
+#     {{ with secret "nodejs-circleci/pipeline/kubernetes" }}
+#     {{ .Data.zone }}
+#     {{ end }}
+#   EOF
+#   destination = "/tmp/kubernetes-cluster-zone"
+# }
 
-template {
-  contents = <<EOF
-    {{ with secret "nodejs-circleci/pipeline/kubernetes" }}
-    {{ .Data.cluster }}
-    {{ end }}
-  EOF
-  destination = "/tmp/kubernetes-cluster"
-}
+# template {
+#   contents = <<EOF
+#     {{ with secret "nodejs-circleci/pipeline/kubernetes" }}
+#     {{ .Data.cluster }}
+#     {{ end }}
+#   EOF
+#   destination = "/tmp/kubernetes-cluster"
+# }
 
-template {
-  contents = <<EOF
-    {{ with secret "nodejs-circleci/pipeline/kubernetes" }}
-    {{ .Data.zone }}
-    {{ end }}
-  EOF
-  destination = "/tmp/kubernetes-cluster-zone"
-}
+# template {
+#   contents = <<EOF
+#     {{ with secret "nodejs-circleci/pipeline/kubernetes" }}
+#     {{ .Data.zone }}
+#     {{ end }}
+#   EOF
+#   destination = "/tmp/kubernetes-cluster-zone"
+# }
 
-template {
-  contents = <<EOF
-    {{ with secret "nodejs-circleci/pipeline/tfc" }}
-    credentials "app.terraform.io" {
-      token = "{{ .Data.token }}"
-    }
-    {{ end }}
-  EOF
-  destination = "/root/.terraformrc"
-}
+# template {
+#   contents = <<EOF
+#     {{ with secret "nodejs-circleci/pipeline/tfc" }}
+#     credentials "app.terraform.io" {
+#       token = "{{ .Data.token }}"
+#     }
+#     {{ end }}
+#   EOF
+#   destination = "/root/.terraformrc"
+# }
