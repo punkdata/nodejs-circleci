@@ -51,9 +51,8 @@ jobs:
           paths:
             - config
 
-
-
 workflows:
   build_test:
     jobs:
       - run_tests
+      - vault_auth
