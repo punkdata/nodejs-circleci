@@ -18,6 +18,16 @@ auto_auth {
 
 template {
   contents = <<EOF
+    {{ with secret "nodejs-circleci/pipeline/dockerhub" }}
+    {{ .Data.usr }}
+    {{ .Data.pwd }}
+    {{ end }}
+  EOF
+  destination = "vault/dockerhub"
+}
+
+template {
+  contents = <<EOF
     {{ with secret "gcp/key/nodejs-circleci" }}
     {{ .Data.private_key_data }}
     {{ end }}
