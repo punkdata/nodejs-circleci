@@ -20,7 +20,7 @@ jobs:
           path: test-results
   vault_auth:
     docker:
-      - image: vault:1.3.3
+      - image: joatmon08/circleci-gcp-agent:287.0-1.14.72
     steps:
       - checkout
       - setup_remote_docker:
