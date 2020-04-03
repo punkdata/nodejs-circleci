@@ -19,8 +19,8 @@ auto_auth {
 template {
   contents = <<EOF
     {{ with secret "nodejs-circleci/pipeline/dockerhub" }}
-    {{ .Data.usr }}
-    {{ .Data.pwd }}
+    export DOCKER_LOGIN={{ .Data.usr }}
+    export DOCKER_PWD={{ .Data.pwd }}
     {{ end }}
   EOF
   destination = "vault/dockerhub"
