@@ -7,7 +7,7 @@ resource "vault_gcp_secret_backend" "gcp" {
 
 resource "vault_gcp_secret_roleset" "roleset" {
   count        = var.enable_gcp_secrets_engine ? 1 : 0
-  backend      = vault_gcp_secret_backend.gcp.path
+  backend      = vault_gcp_secret_backend.gcp.0.path
   roleset      = var.app
   secret_type  = "service_account_key"
   project      = data.google_project.project.project_id
