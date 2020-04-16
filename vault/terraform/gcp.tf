@@ -1,12 +1,12 @@
 resource "vault_gcp_secret_backend" "gcp" {
-  count                     = enable_gcp_secrets_engine ? 1 : 0
+  count                     = var.enable_gcp_secrets_engine ? 1 : 0
   credentials               = var.gcp_credentials
   default_lease_ttl_seconds = 600
   max_lease_ttl_seconds     = 1800
 }
 
 resource "vault_gcp_secret_roleset" "roleset" {
-  count        = enable_gcp_secrets_engine ? 1 : 0
+  count        = var.enable_gcp_secrets_engine ? 1 : 0
   backend      = vault_gcp_secret_backend.gcp.path
   roleset      = var.app
   secret_type  = "service_account_key"
