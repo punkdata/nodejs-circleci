@@ -36,24 +36,23 @@ jobs:
             docker build -t $DOCKER_LOGIN/$IMAGE_NAME:$TAG .
             echo $DOCKER_PWD | docker login -u $DOCKER_LOGIN --password-stdin
             docker push $DOCKER_LOGIN/$IMAGE_NAME:$TAG
-      # - persist_to_workspace:
-      #     root: ~/project/vault
-      #       # Must be relative path from root
-      #     paths:
-      #       - dockerhub
-  kubeconfig:
+      - persist_to_workspace:
+          root: /tmp
+          paths:
+            - "*"
+  deploy_to_k8s:
     docker:
       - image: joatmon08/circleci-gcp-agent:287.0-1.14.72
     steps:
-      - run:
-          name: Authenticate to Vault
-          command: echo "vault"
+      - attach_workspace:
+          at: /tmp
       - run:
           name: Authenticate to GCP
           command: |
             gcloud auth activate-service-account --key-file=/tmp/service-account
             gcloud config set project $(cat /tmp/gcp-project)
             gcloud container clusters get-credentials $(cat /tmp/kubernetes-cluster) --zone $(cat /tmp/kubernetes-cluster-zone)
+            kubectl version
       - persist_to_workspace:
           root: /root/.kube
           paths:
@@ -64,3 +63,6 @@ workflows:
     jobs:
       - run_tests
       - vault_auth
+      - deploy_to_k8s:
+         requires:
+           - vault_auth
