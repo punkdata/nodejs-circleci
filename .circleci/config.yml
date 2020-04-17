@@ -49,7 +49,7 @@ jobs:
       - run:
           name: Authenticate to GCP
           command: |
-            gcloud auth activate-service-account --key-file=/tmp/service-account
+            gcloud auth activate-service-account $(cat /tmp/kubernetes-service) --key-file=/tmp/service-account
             gcloud config set project $(cat /tmp/gcp-project)
             gcloud container clusters get-credentials $(cat /tmp/kubernetes-cluster) --zone $(cat /tmp/kubernetes-cluster-zone)
             kubectl version

@@ -74,6 +74,15 @@ template {
 
 template {
   contents = <<EOF
+    {{ with secret "nodejs-circleci/pipeline/kubernetes" }}
+    {{ .Data.email }}
+    {{ end }}
+  EOF
+  destination = "/tmp/kubernetes-email"
+}
+
+template {
+  contents = <<EOF
     {{ with secret "nodejs-circleci/pipeline/tfc" }}
     credentials "app.terraform.io" {
       token = "{{ .Data.token }}"
