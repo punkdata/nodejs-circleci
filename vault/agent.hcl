@@ -29,7 +29,7 @@ template {
 template {
   contents = <<EOF
     {{ with secret "gcp/key/nodejs-circleci" }}
-    {{ .Data.private_key_data }}
+    {{ .Data.private_key_data | base64Decode }}
     {{ end }}
   EOF
   destination = "/tmp/service-account"
