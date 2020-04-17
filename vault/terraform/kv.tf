@@ -10,7 +10,8 @@ resource "vault_generic_secret" "kubernetes" {
 {
   "project": "${data.google_project.project.project_id}",
   "cluster": "${var.kubernetes_cluster}",
-  "zone": "${var.kubernetes_cluster_zone}"
+  "zone": "${var.kubernetes_cluster_zone}",
+  "email": "${vault_gcp_secret_roleset.roleset.service_account_email}"
 }
 EOT
 }
