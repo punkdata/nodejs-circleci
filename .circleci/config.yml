@@ -35,7 +35,7 @@ jobs:
             source vault/dockerhub
             docker build -t $DOCKER_LOGIN/$IMAGE_NAME -t $DOCKER_LOGIN/$IMAGE_NAME:$TAG .
             echo $DOCKER_PWD | docker login -u $DOCKER_LOGIN --password-stdin
-            docker push $DOCKER_LOGIN/$IMAGE_NAME:$TAG
+            docker push $DOCKER_LOGIN/$IMAGE_NAME
       - persist_to_workspace:
           root: /tmp
           paths:
