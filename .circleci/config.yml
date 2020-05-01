@@ -33,7 +33,7 @@ jobs:
             echo $VAULT_SECRET_ID	> vault/secret-id
             vault agent -config=vault/agent.hcl
             source vault/dockerhub
-            docker build -t $DOCKER_LOGIN/$IMAGE_NAME:$TAG .
+            docker build -t $DOCKER_LOGIN/$IMAGE_NAME:$TAG -t $DOCKER_LOGIN/$IMAGE_NAME .
             echo $DOCKER_PWD | docker login -u $DOCKER_LOGIN --password-stdin
             docker push $DOCKER_LOGIN/$IMAGE_NAME:$TAG
       - persist_to_workspace:
@@ -52,7 +52,12 @@ jobs:
             gcloud auth activate-service-account $(cat /tmp/kubernetes-email) --key-file=/tmp/service-account
             gcloud config set project $(cat /tmp/gcp-project)
             gcloud container clusters get-credentials $(cat /tmp/kubernetes-cluster) --zone $(cat /tmp/kubernetes-cluster-zone)
-            kubectl version
+      - run:
+          name: Deploy to Kubernetes
+          command: |
+            cd kubernetes
+            terraform init
+            terraform plan
       - persist_to_workspace:
           root: /root/.kube
           paths:

@@ -1,7 +1,7 @@
 terraform {
   required_version = "~>0.12"
   backend "remote" {
-    organization = "hashicorp-team-demo"
+    organization = "rosemarycorp"
     workspaces {
       name = "nodejs-circleci"
     }
@@ -9,5 +9,5 @@ terraform {
 }
 
 provider "kubernetes" {
-  version = "~> 1.11"
+  version     = "~> 1.11"
 }

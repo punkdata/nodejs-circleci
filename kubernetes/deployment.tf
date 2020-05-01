@@ -24,17 +24,11 @@ resource "kubernetes_deployment" "app" {
 
       spec {
         container {
-          image = "nginx:1.7.8"
+          image = var.image
           name  = var.app
-
-          liveness_probe {
-            http_get {
-              path = "/nginx_status"
-              port = 80
-            }
-
-            initial_delay_seconds = 3
-            period_seconds        = 3
+          port {
+            name           = "port-5000"
+            container_port = 5000
           }
         }
       }
