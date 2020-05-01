@@ -33,7 +33,7 @@ jobs:
             echo $VAULT_SECRET_ID	> vault/secret-id
             vault agent -config=vault/agent.hcl
             source vault/dockerhub
-            docker build -t $DOCKER_LOGIN/$IMAGE_NAME:$TAG -t $DOCKER_LOGIN/$IMAGE_NAME .
+            docker build -t $DOCKER_LOGIN/$IMAGE_NAME -t $DOCKER_LOGIN/$IMAGE_NAME:$TAG .
             echo $DOCKER_PWD | docker login -u $DOCKER_LOGIN --password-stdin
             docker push $DOCKER_LOGIN/$IMAGE_NAME:$TAG
       - persist_to_workspace:
@@ -88,7 +88,6 @@ workflows:
       - deploy_to_k8s:
          requires:
            - vault_auth
-           - run_tests
       - approve_destroy:
          type: approval
          requires:
