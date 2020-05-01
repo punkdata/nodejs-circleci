@@ -59,12 +59,27 @@ jobs:
             cd kubernetes
             export TF_CLI_CONFIG_FILE=/tmp/.terraformrc
             terraform init
-            terraform plan
-      - persist_to_workspace:
-          root: /root/.kube
-          paths:
-            - config
-
+            terraform apply -auto-approve
+  destroy_k8s:
+    docker:
+        - image: joatmon08/circleci-gcp-agent:287.0-1.14.72
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /tmp
+      - run:
+          name: Authenticate to GCP
+          command: |
+            gcloud auth activate-service-account $(cat /tmp/kubernetes-email) --key-file=/tmp/service-account
+            gcloud config set project $(cat /tmp/gcp-project)
+            gcloud container clusters get-credentials $(cat /tmp/kubernetes-cluster) --zone $(cat /tmp/kubernetes-cluster-zone)
+      - run:
+          name: Deploy to Kubernetes
+          command: |
+            cd kubernetes
+            export TF_CLI_CONFIG_FILE=/tmp/.terraformrc
+            terraform init
+            terraform destroy -auto-approve
 workflows:
   build_test:
     jobs:
@@ -73,3 +88,12 @@ workflows:
       - deploy_to_k8s:
          requires:
            - vault_auth
+           - run_tests
+      - approve_destroy:
+         type: approval
+         requires:
+           - deploy_to_k8s
+      - destroy_k8s:
+         requires:
+           - approve_destroy
+           
