@@ -44,6 +44,7 @@ jobs:
     docker:
       - image: joatmon08/circleci-gcp-agent:287.0-1.14.72
     steps:
+      - checkout
       - attach_workspace:
           at: /tmp
       - run:
