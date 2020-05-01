@@ -57,6 +57,7 @@ jobs:
           name: Deploy to Kubernetes
           command: |
             cd kubernetes
+            export TF_CLI_CONFIG_FILE=/tmp/.terraformrc
             terraform init
             terraform plan
       - persist_to_workspace:

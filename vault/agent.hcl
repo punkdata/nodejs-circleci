@@ -89,5 +89,5 @@ template {
     }
     {{ end }}
   EOF
-  destination = "/root/.terraformrc"
+  destination = "/tmp/.terraformrc"
 }
