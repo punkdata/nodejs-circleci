@@ -1,0 +1,13 @@
+FROM node:14-alpine
+RUN mkdir -p /opt/app && chown -R node:node /opt/app
+WORKDIR /opt/app 
+COPY package*.json ./
+USER node
+RUN npm install --only=production
+# If you are building your code for production
+# RUN npm install --only=production
+
+# Bundle app source
+COPY --chown=node:node . .
+# EXPOSE 5000
+CMD [ "npm", "start" ]
