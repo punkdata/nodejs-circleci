@@ -33,9 +33,9 @@ jobs:
             echo $VAULT_SECRET_ID	> vault/secret-id
             vault agent -config=vault/agent.hcl
             source vault/dockerhub
-            docker build -t $DOCKER_LOGIN/$IMAGE_NAME:$TAG .
+            docker build -t $DOCKER_LOGIN/$IMAGE_NAME -t $DOCKER_LOGIN/$IMAGE_NAME:$TAG .
             echo $DOCKER_PWD | docker login -u $DOCKER_LOGIN --password-stdin
-            docker push $DOCKER_LOGIN/$IMAGE_NAME:$TAG
+            docker push $DOCKER_LOGIN/$IMAGE_NAME
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -44,6 +44,7 @@ jobs:
     docker:
       - image: joatmon08/circleci-gcp-agent:287.0-1.14.72
     steps:
+      - checkout
       - attach_workspace:
           at: /tmp
       - run:
@@ -52,12 +53,33 @@ jobs:
             gcloud auth activate-service-account $(cat /tmp/kubernetes-email) --key-file=/tmp/service-account
             gcloud config set project $(cat /tmp/gcp-project)
             gcloud container clusters get-credentials $(cat /tmp/kubernetes-cluster) --zone $(cat /tmp/kubernetes-cluster-zone)
-            kubectl version
-      - persist_to_workspace:
-          root: /root/.kube
-          paths:
-            - config
-
+      - run:
+          name: Deploy to Kubernetes
+          command: |
+            cd kubernetes
+            export TF_CLI_CONFIG_FILE=/tmp/.terraformrc
+            terraform init
+            terraform apply -auto-approve
+  destroy_k8s:
+    docker:
+        - image: joatmon08/circleci-gcp-agent:287.0-1.14.72
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /tmp
+      - run:
+          name: Authenticate to GCP
+          command: |
+            gcloud auth activate-service-account $(cat /tmp/kubernetes-email) --key-file=/tmp/service-account
+            gcloud config set project $(cat /tmp/gcp-project)
+            gcloud container clusters get-credentials $(cat /tmp/kubernetes-cluster) --zone $(cat /tmp/kubernetes-cluster-zone)
+      - run:
+          name: Deploy to Kubernetes
+          command: |
+            cd kubernetes
+            export TF_CLI_CONFIG_FILE=/tmp/.terraformrc
+            terraform init
+            terraform destroy -auto-approve
 workflows:
   build_test:
     jobs:
@@ -66,3 +88,11 @@ workflows:
       - deploy_to_k8s:
          requires:
            - vault_auth
+      - approve_destroy:
+         type: approval
+         requires:
+           - deploy_to_k8s
+      - destroy_k8s:
+         requires:
+           - approve_destroy
+           

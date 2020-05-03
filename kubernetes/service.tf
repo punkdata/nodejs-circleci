@@ -8,9 +8,9 @@ resource "kubernetes_service" "app" {
     }
     port {
       port        = 80
-      target_port = 80
+      target_port = 5000
     }
 
-    type = "LoadBalancer"
+    type = var.service_type
   }
 }
