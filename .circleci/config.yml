@@ -51,7 +51,7 @@ jobs:
             cd terraform/gke_cluster/
             terraform init
             terraform plan -var credentials=$HOME/gcloud_keys -out=plan.txt
-            terraform apply plan.txt --auto-approve
+            terraform apply plan.txt
             gcloud container clusters get-credentials $(terraform output cluster) --zone="us-east1-d"
       - run:
          name: Deploy Application
@@ -60,7 +60,7 @@ jobs:
             terraform init
             # Deploy app-var
             terraform plan -var $DOCKER_IMAGE -out=plan.txt
-            terraform apply -var $DOCKER_IMAGE --auto-approve
+            terraform apply plan.txt
             sleep 3m
             terraform destroy -var $DOCKER_IMAGE --auto-approve
             cd ../gke_cluster/
