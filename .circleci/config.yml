@@ -58,7 +58,7 @@ jobs:
             cd terraform/kubernetes
             terraform init
             # Deploy app-var
-            export DOCKER_IMAGE="docker-image=${DOCKER_LOGIN}/${CIRCLE_PROJECT_REPONAME}:<< pipeline.id >>"
+            export DOCKER_IMAGE="docker-image=${DOCKER_LOGIN}/${CIRCLE_PROJECT_REPONAME}:<< pipeline.number >>"
             terraform plan -var $DOCKER_IMAGE -out=plan.txt
             terraform apply plan.txt
             sleep 3m
