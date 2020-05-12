@@ -44,7 +44,7 @@ jobs:
       - run:
           name: Create GKE Cluster
           command: |
-            echo ${GOOGLE_CLOUD_KEYS} | base64 --decode --ignore-garbage > ${HOME}/gcloud_keys
+            echo ${GOOGLE_CLOUD_KEYS} | base64 -d > ${HOME}/gcloud_keys
             ./google-cloud-sdk/install.sh  --quiet
             gcloud auth activate-service-account --key-file ${HOME}/gcloud_keys
             cd terraform/gke_cluster/
