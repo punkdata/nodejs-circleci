@@ -73,7 +73,7 @@ workflows:
       - build_docker_image
       - create_gke_cluster:
           requires:
-            -run_tests
+            - run_tests
             - build_docker_image
       # - approve-destroy:
       #     type: approval
