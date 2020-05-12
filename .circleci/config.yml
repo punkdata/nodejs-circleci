@@ -34,11 +34,11 @@ jobs:
             docker build -t $DOCKER_LOGIN/$IMAGE_NAME -t $DOCKER_LOGIN/$IMAGE_NAME:$TAG .
             echo $DOCKER_PWD | docker login -u $DOCKER_LOGIN --password-stdin
             docker push $DOCKER_LOGIN/$IMAGE_NAME
-  create_gke_cluster:
+  gke_create_cluster:
     docker:
       - image: ariv3ra/terraform-gcp:latest
     environment:
-      CLOUDSDK_CORE_PROJECT: cicd-workshops      
+      CLOUDSDK_CORE_PROJECT: cicd-workshops
     steps:
       - checkout
       - run:
@@ -52,16 +52,40 @@ jobs:
             terraform plan -var credentials=$HOME/gcloud_keys -out=plan.txt
             terraform apply plan.txt
             gcloud container clusters get-credentials $(terraform output cluster) --zone="us-east1-d"
+  gke_deploy_app:
+    docker:
+      - image: ariv3ra/terraform-gcp:latest
+    environment:
+      CLOUDSDK_CORE_PROJECT: cicd-workshops
+    steps:
+      - checkout
       - run:
-         name: Deploy Application
-         command: |
+          name: Deploy App to GKE
+          command: |
+            export TAG=0.2.<< pipeline.number >>
+            export DOCKER_IMAGE="docker-image=${DOCKER_LOGIN}/${CIRCLE_PROJECT_REPONAME}:$TAG"           
+            echo $TF_CLOUD_TOKEN | base64 -d > $HOME/.terraformrc
+            echo $GOOGLE_CLOUD_KEYS | base64 -d > $HOME/gcloud_keys
+            gcloud auth activate-service-account --key-file ${HOME}/gcloud_keys
             cd terraform/kubernetes
             terraform init
-            export TAG=0.2.<< pipeline.number >>
-            export DOCKER_IMAGE="docker-image=${DOCKER_LOGIN}/${CIRCLE_PROJECT_REPONAME}:$TAG"
             terraform plan -var $DOCKER_IMAGE -out=plan.txt
             terraform apply plan.txt
-            sleep 3m
+  gke_destroy:
+    docker:
+      - image: ariv3ra/terraform-gcp:latest
+    environment:
+      CLOUDSDK_CORE_PROJECT: cicd-workshops
+    steps:
+      - checkout
+      - run:
+          name: Destroy GKE Cluster
+          command: |
+            echo $TF_CLOUD_TOKEN | base64 -d > $HOME/.terraformrc
+            echo $GOOGLE_CLOUD_KEYS | base64 -d > $HOME/gcloud_keys
+            gcloud auth activate-service-account --key-file ${HOME}/gcloud_keys
+            cd terraform/kubernetes
+            terraform init
             terraform destroy -var $DOCKER_IMAGE --auto-approve
             cd ../gke_cluster/
             terraform destroy -var credentials=$HOME/gcloud_keys --auto-approve
@@ -70,12 +94,20 @@ workflows:
     jobs:
       - run_tests
       - build_docker_image
-      - create_gke_cluster:
+      - gke_create_cluster
+          # requires:
+          #   - run_tests
+          #   - build_docker_image
+      - gke_deploy_app:
           requires:
             - run_tests
             - build_docker_image
-      # - approve-destroy:
-      #     type: approval
-      #     requires:
-      #       - create_gke_cluster
-      # - destroy_cluster
+            - gke_create_cluster
+      - approve-destroy:
+          type: approval
+          requires:
+            - gke_create_cluster
+            - gke_deploy_app
+      - gke_create_cluster:
+          requires:
+            - approve-destroy
