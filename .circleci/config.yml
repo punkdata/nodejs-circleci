@@ -38,9 +38,7 @@ jobs:
     docker:
       - image: ariv3ra/terraform-gcp:latest
     environment:
-      CLOUDSDK_CORE_PROJECT: cicd-workshops
-      DOCKER_IMAGE: docker-image=${DOCKER_LOGIN}/${CIRCLE_PROJECT_REPONAME}:<< pipeline.id >>
-      
+      CLOUDSDK_CORE_PROJECT: cicd-workshops      
     steps:
       - checkout
       - run:
@@ -60,6 +58,7 @@ jobs:
             cd terraform/kubernetes
             terraform init
             # Deploy app-var
+            export DOCKER_IMAGE="docker-image=${DOCKER_LOGIN}/${CIRCLE_PROJECT_REPONAME}:<< pipeline.id >>"
             terraform plan -var $DOCKER_IMAGE -out=plan.txt
             terraform apply plan.txt
             sleep 3m
