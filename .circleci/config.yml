@@ -64,7 +64,7 @@ jobs:
             sleep 3m
             terraform destroy -var $DOCKER_IMAGE --auto-approve
             cd ../gke_cluster/
-            terraform destroy --auto-approve
+            terraform destroy -var credentials=$HOME/gcloud_keys --auto-approve
 workflows:
   build_test:
     jobs:
