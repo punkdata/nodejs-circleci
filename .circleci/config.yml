@@ -59,10 +59,11 @@ jobs:
             cd terraform/kubernetes
             terraform init
             terraform output -state=../gke_cluster/terraform.tfstate cluster
-            # Deploy app
+            # Deploy app-var
+            terraform plan -var $DOCKER_IMAGE -out=plan.txt
             terraform apply -var $DOCKER_IMAGE --auto-approve
             sleep 3m
-            terraform destroy --auto-approve
+            terraform destroy -var $DOCKER_IMAGE --auto-approve
             cd ../gke_cluster/
             terraform destroy --auto-approve
 workflows:
@@ -72,6 +73,7 @@ workflows:
       - build_docker_image
       - create_gke_cluster:
           requires:
+            -run_tests
             - build_docker_image
       # - approve-destroy:
       #     type: approval
