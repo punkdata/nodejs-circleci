@@ -39,17 +39,19 @@ jobs:
       - image: ariv3ra/terraform-gcp:latest
     environment:
       DOCKER_IMAGE: docker-image=${DOCKER_LOGIN}/${CIRCLE_PROJECT_REPONAME}:<< pipeline.id >>
+      
     steps:
       - checkout
       - run:
           name: Create GKE Cluster
           command: |
+            touch ~/.terraformrc && echo 'credentials "app.terraform.io"{token = "$TF_CLOUD_TOKEN"}' > ~/.terraformrc
             echo ${GOOGLE_CLOUD_KEYS} | base64 -d > $HOME/gcloud_keys
             gcloud auth activate-service-account --key-file ${HOME}/gcloud_keys
             cd terraform/gke_cluster/
             terraform init
             terraform plan -var credentials=$HOME/gcloud_keys -out=plan.txt
-            terraform apply -var credentials=$HOME/gcloud_keys --auto-approve
+            terraform apply plan.txt --auto-approve
             gcloud container clusters get-credentials $(terraform output cluster) --zone="us-east1-d"
       - run:
          name: Deploy Application

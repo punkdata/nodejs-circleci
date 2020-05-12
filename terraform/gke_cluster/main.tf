@@ -1,8 +1,18 @@
 terraform {
-  backend "local" {
-   path = "terraform.tfstate"
+  required_version = "~>0.12"
+  backend "remote" {
+    organization = "datapunks"
+    workspaces {
+      name = "nodejs-circleci-gke"
+    }
   }
 }
+
+# terraform {
+#   backend "local" {
+#    path = "terraform.tfstate"
+#   }
+# }
 
 resource "google_container_cluster" "primary" {
   name               = var.cluster
