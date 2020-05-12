@@ -21,7 +21,7 @@ jobs:
     docker:
       - image: circleci/node:12
     environment:
-      CIRCLE_PIPELINE_ID: << pipeline.id >>
+      CIRCLE_PIPELINE_ID: << pipeline.number >>
     steps:
       - checkout
       - setup_remote_docker:
