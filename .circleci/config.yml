@@ -38,7 +38,7 @@ jobs:
     docker:
       - image: ariv3ra/terraform-gcp:latest
     environment:
-      DOCKER_IMAGE: "docker-image=${DOCKER_LOGIN}/${CIRCLE_PROJECT_REPONAME}:<< pipeline.id >>"
+      DOCKER_IMAGE: docker-image=${DOCKER_LOGIN}/${CIRCLE_PROJECT_REPONAME}:<< pipeline.id >>
     steps:
       - checkout
       - run:
@@ -48,7 +48,7 @@ jobs:
             gcloud auth activate-service-account --key-file ${HOME}/gcloud_keys
             cd terraform/gke_cluster/
             terraform init
-            terraform plan -out=plan.txt
+            terraform plan -var credentials=$HOME/gcloud_keys -out=plan.txt
             terraform apply -var credentials=$HOME/gcloud_keys --auto-approve
             gcloud container clusters get-credentials $(terraform output cluster) --zone="us-east1-d"
       - run:
