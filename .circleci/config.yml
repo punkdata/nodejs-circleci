@@ -38,6 +38,7 @@ jobs:
     docker:
       - image: ariv3ra/terraform-gcp:latest
     environment:
+      CLOUDSDK_CORE_PROJECT: cicd-workshops
       DOCKER_IMAGE: docker-image=${DOCKER_LOGIN}/${CIRCLE_PROJECT_REPONAME}:<< pipeline.id >>
       
     steps:
