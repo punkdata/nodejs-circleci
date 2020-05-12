@@ -45,8 +45,8 @@ jobs:
       - run:
           name: Create GKE Cluster
           command: |
-            touch ~/.terraformrc && echo 'credentials "app.terraform.io"{token = "$TF_CLOUD_TOKEN"}' > ~/.terraformrc
-            echo ${GOOGLE_CLOUD_KEYS} | base64 -d > $HOME/gcloud_keys
+            echo $TF_CLOUD_TOKEN | base64 -d > $HOME/.terraformrc
+            echo $GOOGLE_CLOUD_KEYS | base64 -d > $HOME/gcloud_keys
             gcloud auth activate-service-account --key-file ${HOME}/gcloud_keys
             cd terraform/gke_cluster/
             terraform init
@@ -58,7 +58,6 @@ jobs:
          command: |
             cd terraform/kubernetes
             terraform init
-            terraform output -state=../gke_cluster/terraform.tfstate cluster
             # Deploy app-var
             terraform plan -var $DOCKER_IMAGE -out=plan.txt
             terraform apply -var $DOCKER_IMAGE --auto-approve
