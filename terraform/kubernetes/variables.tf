@@ -1,7 +1,7 @@
 variable "app" {
   type        = string
   description = "Name of application"
-  default = "cicd-101"
+  default     = "cicd-101"
 }
 
 variable "zone" {
@@ -9,6 +9,6 @@ variable "zone" {
 }
 
 variable "docker-image" {
-  type = string
+  type        = string
   description = "name of the docker image to deploy"
 }

@@ -14,5 +14,5 @@ terraform {
 #   }
 # }
 
-provider "kubernetes" {  
+provider "kubernetes" {
 }

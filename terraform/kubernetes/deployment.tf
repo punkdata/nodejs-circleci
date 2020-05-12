@@ -27,7 +27,7 @@ resource "kubernetes_deployment" "app" {
           image = var.docker-image
           name  = var.app
           port {
-            name = "port-5000"
+            name           = "port-5000"
             container_port = 5000
           }
         }

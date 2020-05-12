@@ -80,7 +80,8 @@ website/build
 website/node_modules
 .vagrant/
 *.backup
-./*.tfstate
+# ./*.tfstate
+*.tfstate
 .terraform/
 *.log
 *.bak
