@@ -20,8 +20,6 @@ jobs:
   build_docker_image:
     docker:
       - image: circleci/node:12
-    environment:
-      CIRCLE_PIPELINE_ID: << pipeline.number >>
     steps:
       - checkout
       - setup_remote_docker:
@@ -29,7 +27,7 @@ jobs:
       - run:
           name: Build Docker image
           command: |
-            export TAG=0.2.${CIRCLE_PIPELINE_ID}
+            export TAG=0.2.<< pipeline.number >>
             export IMAGE_NAME=$CIRCLE_PROJECT_REPONAME
             docker build -t $DOCKER_LOGIN/$IMAGE_NAME -t $DOCKER_LOGIN/$IMAGE_NAME:$TAG .
             echo $DOCKER_PWD | docker login -u $DOCKER_LOGIN --password-stdin
@@ -95,9 +93,6 @@ workflows:
       - run_tests
       - build_docker_image
       - gke_create_cluster
-          # requires:
-          #   - run_tests
-          #   - build_docker_image
       - gke_deploy_app:
           requires:
             - run_tests
@@ -108,6 +103,6 @@ workflows:
           requires:
             - gke_create_cluster
             - gke_deploy_app
-      - gke_create_cluster:
+      - gke_destroy:
           requires:
             - approve-destroy
