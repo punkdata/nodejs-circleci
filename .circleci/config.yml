@@ -58,7 +58,7 @@ jobs:
             cd terraform/kubernetes
             terraform init
             export TAG=0.2.<< pipeline.number >>
-            export DOCKER_IMAGE="docker-image=${DOCKER_LOGIN}/${CIRCLE_PROJECT_REPONAME}:$TAG
+            export DOCKER_IMAGE="docker-image=${DOCKER_LOGIN}/${CIRCLE_PROJECT_REPONAME}:$TAG"
             terraform apply plan.txt
             sleep 3m
             terraform destroy -var $DOCKER_IMAGE --auto-approve
