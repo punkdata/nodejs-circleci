@@ -2,7 +2,7 @@ version: 2.1
 jobs:
   run_tests:
     docker:
-      - image: circleci/node:10
+      - image: circleci/node:12
     steps:
       - checkout
       - run:
@@ -17,7 +17,63 @@ jobs:
           path: test-results
       - store_artifacts:
           path: test-results
+  build_docker_image:
+    docker:
+      - image: circleci/node:12
+    environment:
+      CIRCLE_PIPELINE_ID: << pipeline.id >>
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: false
+      - run:
+          name: Build Docker image
+          command: |
+            export TAG=0.2.${CIRCLE_PIPELINE_ID}
+            export IMAGE_NAME=$CIRCLE_PROJECT_REPONAME
+            docker build -t $DOCKER_LOGIN/$IMAGE_NAME -t $DOCKER_LOGIN/$IMAGE_NAME:$TAG .
+            echo $DOCKER_PWD | docker login -u $DOCKER_LOGIN --password-stdin
+            docker push $DOCKER_LOGIN/$IMAGE_NAME
+  create_gke_cluster:
+    docker:
+      - image: ariv3ra/terraform-gcp:latest
+    environment:
+      DOCKER_IMAGE: ${DOCKER_LOGIN}/${CIRCLE_PROJECT_REPONAME}:<< pipeline.id >>
+    steps:
+      - checkout
+      - run:
+          name: Create GKE Cluster
+          command: |
+            echo ${GOOGLE_CLOUD_KEYS} | base64 --decode --ignore-garbage > ${HOME}/gcloud_keys
+            ./google-cloud-sdk/install.sh  --quiet
+            gcloud auth activate-service-account --key-file ${HOME}/gcloud_keys
+            cd terraform/gke_cluster/
+            terraform init
+            terraform plan -out=plan.txt
+            terraform apply --auto-approve
+            gcloud container clusters get-credentials $(terraform output cluster) --zone="us-east1-d"
+      - run:
+         name: Deploy Application
+         command: |
+            cd terraform/kubernetes
+            terraform init
+            terraform output -state=../gke_cluster/terraform.tfstate cluster
+            # Deploy app
+            terraform apply -var $(DOCKER_IMAGE) --auto-approve
+            sleep 3m
+            terraform destroy --auto-approve
+            cd ../gke_cluster/
+            terraform destroy --auto-approve
 workflows:
   build_test:
     jobs:
       - run_tests
+      - build_docker_image
+      - create_gke_cluster:
+          requires:
+            - build_docker_image
+      # - approve-destroy:
+      #     type: approval
+      #     requires:
+      #       - create_gke_cluster
+      # - destroy_cluster
