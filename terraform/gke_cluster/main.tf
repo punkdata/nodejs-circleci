@@ -8,12 +8,6 @@ terraform {
   }
 }
 
-# terraform {
-#   backend "local" {
-#    path = "terraform.tfstate"
-#   }
-# }
-
 resource "google_container_cluster" "primary" {
   name               = var.cluster
   location           = var.zone

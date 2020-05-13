@@ -3,16 +3,10 @@ terraform {
   backend "remote" {
     organization = "datapunks"
     workspaces {
-      name = "nodejs-circleci-kubernetes"
+      name = "nodejs-circleci-k8s"
     }
   }
 }
-
-# terraform {
-#   backend "local" {
-#    path = "terraform.tfstate"
-#   }
-# }
 
 provider "kubernetes" {
 }
