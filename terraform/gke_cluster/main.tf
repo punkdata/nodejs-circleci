@@ -38,7 +38,7 @@ resource "google_container_cluster" "primary" {
     metadata = {
       disable-legacy-endpoints = "true"
     }
-    
+
     labels = {
       app = var.app_name
     }

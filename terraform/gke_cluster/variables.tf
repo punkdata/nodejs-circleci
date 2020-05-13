@@ -7,7 +7,7 @@ variable "region" {
 }
 
 variable "zone" {
-   default = "us-east1-d"
+  default = "us-east1-d"
 }
 
 variable "cluster" {

@@ -1,3 +1,7 @@
+variable "cluster" {
+  default = "cicd-workshops"
+}
+
 variable "app" {
   type        = string
   description = "Name of application"
@@ -11,4 +15,6 @@ variable "zone" {
 variable "docker-image" {
   type        = string
   description = "name of the docker image to deploy"
+  default     = "ariv3ra/nodejs-circleci:latest"
 }
+
