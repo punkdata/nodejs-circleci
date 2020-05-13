@@ -61,14 +61,14 @@ jobs:
           command: |
             export CLUSTER_NAME="cicd-workshops"
             export TAG=0.2.<< pipeline.number >>
-            export DOCKER_IMAGE="docker-image=${DOCKER_LOGIN}/${CIRCLE_PROJECT_REPONAME}:$TAG"
+            export DOCKER_IMAGE="docker-image=${DOCKER_LOGIN}/${CIRCLE_PROJECT_REPONAME}"
             echo $TF_CLOUD_TOKEN | base64 -d > $HOME/.terraformrc
             echo $GOOGLE_CLOUD_KEYS | base64 -d > $HOME/gcloud_keys
             gcloud auth activate-service-account --key-file ${HOME}/gcloud_keys
             cd terraform/kubernetes
             terraform init
             terraform plan -var $DOCKER_IMAGE -out=plan.txt
-            gcloud container clusters get-credentials $CLOUDSDK_CORE_PROJECT --zone="us-east1-d"
+            gcloud container clusters get-credentials $CLUSTER_NAME --zone="us-east1-d"
             terraform apply plan.txt
   gke_destroy_cluster:
     docker:
@@ -82,13 +82,13 @@ jobs:
           command: |
             export CLUSTER_NAME="cicd-workshops"
             export TAG=0.2.<< pipeline.number >>
-            export DOCKER_IMAGE="docker-image=${DOCKER_LOGIN}/${CIRCLE_PROJECT_REPONAME}:$TAG"            
+            export DOCKER_IMAGE="docker-image=${DOCKER_LOGIN}/${CIRCLE_PROJECT_REPONAME}"            
             echo $TF_CLOUD_TOKEN | base64 -d > $HOME/.terraformrc
             echo $GOOGLE_CLOUD_KEYS | base64 -d > $HOME/gcloud_keys
             gcloud auth activate-service-account --key-file ${HOME}/gcloud_keys
             cd terraform/kubernetes
             terraform init
-            gcloud container clusters get-credentials $CLOUDSDK_CORE_PROJECT --zone="us-east1-d"            
+            gcloud container clusters get-credentials $CLUSTER_NAME --zone="us-east1-d"            
             terraform destroy -var $DOCKER_IMAGE --auto-approve
             cd ../gke_cluster/
             terraform destroy -var credentials=$HOME/gcloud_keys --auto-approve
@@ -96,12 +96,12 @@ workflows:
   build_test:
     jobs:
       - run_tests
-      - build_docker_image
+      # - build_docker_image
       - gke_create_cluster
       - gke_deploy_app:
           requires:
             - run_tests
-            - build_docker_image
+            # - build_docker_image
             - gke_create_cluster
       - approve-destroy:
           type: approval
