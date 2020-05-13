@@ -91,6 +91,7 @@ jobs:
             gcloud container clusters get-credentials $CLUSTER_NAME --zone="us-east1-d"            
             terraform destroy -var $DOCKER_IMAGE --auto-approve
             cd ../gke_cluster/
+            terraform init
             terraform destroy -var credentials=$HOME/gcloud_keys --auto-approve
 workflows:
   build_test:
