@@ -81,6 +81,8 @@ jobs:
           name: Destroy GKE Cluster
           command: |
             export CLUSTER_NAME="cicd-workshops"
+            export TAG=0.2.<< pipeline.number >>
+            export DOCKER_IMAGE="docker-image=${DOCKER_LOGIN}/${CIRCLE_PROJECT_REPONAME}:$TAG"            
             echo $TF_CLOUD_TOKEN | base64 -d > $HOME/.terraformrc
             echo $GOOGLE_CLOUD_KEYS | base64 -d > $HOME/gcloud_keys
             gcloud auth activate-service-account --key-file ${HOME}/gcloud_keys
