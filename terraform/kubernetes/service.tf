@@ -13,4 +13,4 @@ resource "kubernetes_service" "app" {
 
     type = "LoadBalancer"
   }
-}
+} 
