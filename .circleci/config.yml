@@ -70,15 +70,23 @@ jobs:
             terraform init
             terraform plan -var $DOCKER_IMAGE -out=plan.txt
             terraform apply plan.txt
-            echo 'export ENDPOINT=$(terraform output endpoint)' >> $BASH_ENV
+            export ENDPOINT="$(terraform output endpoint)"
+            echo 'export ENDPOINT=$ENDPOINT' > /tmp/gke/cluster/gke-endpoint
+      - persist_to_workspace:
+          root: /tmp/gke
+          paths:
+            - cluster/*
+  smoketest_gke_deployment:
+    docker:
+      - image: circleci/node:12
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /tmp/gke/
       - run:
-          name: Smoke Test App Deployment
-          command:
-            source $BASH_ENV
-            cd ~/project/terraform/kubernetes
-            terraform init
-            terraform refresh
-            cd ~/project
+          name: Smoke Test GKE Deployment
+          command: |
+            source /tmp/gke/cluster/gke-endpoint
             ./test/smoke_test $ENDPOINT
   gke_destroy_cluster:
     docker:
@@ -114,11 +122,15 @@ workflows:
             - run_tests
             - build_docker_image
             - gke_create_cluster
+      - smoketest_gke_deployment:
+          requires:
+            - gke_deploy_app
       - approve-destroy:
           type: approval
           requires:
             - gke_create_cluster
             - gke_deploy_app
+            - smoketest_gke_deployment
       - gke_destroy_cluster:
           requires:
             - approve-destroy

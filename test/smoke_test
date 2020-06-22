@@ -18,7 +18,7 @@ do
     break
   else
     echo "Checking Status on host $SMOKE... $TIME_OUT_COUNT seconds elapsed"
-    TIME_OUT_COUNT=$((TIME_OUT_COUNT+10))
+    TIME_OUT_COUNT=$((TIME_OUT_COUNT+5))
   fi
-  sleep 10
+  sleep 5
 done
