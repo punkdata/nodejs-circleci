@@ -70,13 +70,14 @@ jobs:
             terraform init
             terraform plan -var $DOCKER_IMAGE -out=plan.txt
             terraform apply plan.txt
+            echo 'export ENDPOINT=$(terraform output endpoint)' >> $BASH_ENV
       - run:
           name: Smoke Test App Deployment
           command:
+            source $BASH_ENV
             cd ~/project/terraform/kubernetes
             terraform init
             terraform refresh
-            export ENDPOINT=$(terraform output endpoint)
             cd ~/project
             ./test/smoke_test $ENDPOINT
   gke_destroy_cluster:
