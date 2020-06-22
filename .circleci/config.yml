@@ -70,6 +70,13 @@ jobs:
             terraform plan -var $DOCKER_IMAGE -out=plan.txt
             gcloud container clusters get-credentials $CLUSTER_NAME --zone="us-east1-d"
             terraform apply plan.txt
+      - run:
+          name: Smoke Test App Deployment
+          command:
+            cd terraform/kubernetes
+            export ENDPOINT=$(terraform output endpoint)
+            cd ../../
+            ./test/smoke_test $ENDPOINT
   gke_destroy_cluster:
     docker:
       - image: ariv3ra/terraform-gcp:latest
