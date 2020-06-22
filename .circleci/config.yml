@@ -71,12 +71,12 @@ jobs:
             terraform plan -var $DOCKER_IMAGE -out=plan.txt
             terraform apply plan.txt
             export ENDPOINT="$(terraform output endpoint)"
-            mkdir -p /tmp/gke/cluster
-            echo 'export ENDPOINT=$ENDPOINT' > /tmp/gke/cluster/gke-endpoint
+            mkdir -p /tmp/gke/
+            echo 'export ENDPOINT='${ENDPOINT} > /tmp/gke/gke-endpoint
       - persist_to_workspace:
           root: /tmp/gke
           paths:
-            - cluster/*
+            - "*"
   smoketest_gke_deployment:
     docker:
       - image: circleci/node:12
@@ -87,7 +87,7 @@ jobs:
       - run:
           name: Smoke Test GKE Deployment
           command: |
-            source /tmp/gke/cluster/gke-endpoint
+            source /tmp/gke/gke-endpoint
             ./test/smoke_test $ENDPOINT
   gke_destroy_cluster:
     docker:
