@@ -73,10 +73,9 @@ jobs:
       - run:
           name: Smoke Test App Deployment
           command:
-            pwd
-            cd terraform/kubernetes
+            cd ~/project/terraform/kubernetes
             export ENDPOINT=$(terraform output endpoint)
-            cd ../../
+            cd ~/project
             ./test/smoke_test $ENDPOINT
   gke_destroy_cluster:
     docker:
