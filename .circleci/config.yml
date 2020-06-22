@@ -71,6 +71,7 @@ jobs:
             terraform plan -var $DOCKER_IMAGE -out=plan.txt
             terraform apply plan.txt
             export ENDPOINT="$(terraform output endpoint)"
+            mkdir -p /tmp/gke/cluster
             echo 'export ENDPOINT=$ENDPOINT' > /tmp/gke/cluster/gke-endpoint
       - persist_to_workspace:
           root: /tmp/gke
