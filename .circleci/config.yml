@@ -75,6 +75,7 @@ jobs:
           command:
             cd ~/project/terraform/kubernetes
             terraform init
+            terraform refresh
             export ENDPOINT=$(terraform output endpoint)
             cd ~/project
             ./test/smoke_test $ENDPOINT
