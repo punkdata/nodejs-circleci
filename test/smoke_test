@@ -12,7 +12,6 @@ do
   STATUS=$(curl -s -o /dev/null -w '%{http_code}' $SMOKE_URL)
   if [ $STATUS -eq 200 ]; then
     smoke_url_ok $SMOKE_URL
-    smoke_assert_body "Welcome to CI/CD 101 using CircleCI!"
     smoke_report
     echo 'Smoke Tests Successfully Completed.'
     break
