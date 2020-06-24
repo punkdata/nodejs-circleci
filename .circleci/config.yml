@@ -129,22 +129,22 @@ workflows:
     jobs:
       - run_tests
       - insights_api_test
-      - build_docker_image
-      - gke_create_cluster
-      - gke_deploy_app:
-          requires:
-            - run_tests
-            - build_docker_image
-            - gke_create_cluster
-      - smoketest_gke_deployment:
-          requires:
-            - gke_deploy_app
-      - approve-destroy:
-          type: approval
-          requires:
-            - gke_create_cluster
-            - gke_deploy_app
-            - smoketest_gke_deployment
-      - gke_destroy_cluster:
-          requires:
-            - approve-destroy
+      # - build_docker_image
+      # - gke_create_cluster
+      # - gke_deploy_app:
+      #     requires:
+      #       - run_tests
+      #       - build_docker_image
+      #       - gke_create_cluster
+      # - smoketest_gke_deployment:
+      #     requires:
+      #       - gke_deploy_app
+      # - approve-destroy:
+      #     type: approval
+      #     requires:
+      #       - gke_create_cluster
+      #       - gke_deploy_app
+      #       - smoketest_gke_deployment
+      # - gke_destroy_cluster:
+      #     requires:
+      #       - approve-destroy
