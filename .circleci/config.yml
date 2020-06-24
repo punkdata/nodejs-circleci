@@ -28,7 +28,7 @@ jobs:
       - run:
           name: Run Insights Api tests with newman
           command: |
-            newman run "https://api.getpostman.com/collections/4415288-047f3717-e672-4ca5-9488-cf55caf6579c?apikey="$NEWMAN_API_KEY \
+            newman run "https://api.getpostman.com/collections/4415288-047f3717-e672-4ca5-9488-cf55caf6579c?apikey="$NEWMAN_API_KEY /
                 && -e "https://api.getpostman.com/environments/4415288-3f8969a7-c787-4631-b985-6c78a061f17b?apikey="$NEWMAN_API_KEY
   build_docker_image:
     docker:
