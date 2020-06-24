@@ -1,0 +1,24 @@
+#!/bin/bash
+
+. test/smoke.sh
+
+TIME_OUT=60
+TIME_OUT_COUNT=0
+SMOKE_IP=$1
+SMOKE_URL="http://$SMOKE_IP"
+
+while true
+do
+  STATUS=$(curl -s -o /dev/null -w '%{http_code}' $SMOKE_URL)
+  if [ $STATUS -eq 200 ]; then
+    smoke_url_ok $SMOKE_URL
+    smoke_assert_body "Welcome to CI/CD 101 using CircleCI!"
+    smoke_report
+    echo 'Smoke Tests Successfully Completed.'
+    break
+  else
+    echo "Checking Status on host $SMOKE... $TIME_OUT_COUNT seconds elapsed"
+    TIME_OUT_COUNT=$((TIME_OUT_COUNT+5))
+  fi
+  sleep 5
+done
