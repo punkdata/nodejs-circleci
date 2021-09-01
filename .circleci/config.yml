@@ -17,18 +17,6 @@ jobs:
           path: test-results
       - store_artifacts:
           path: test-results
-  insights_api_test:
-    docker:
-      - image: circleci/node:12
-    steps:
-      - checkout
-      - run:
-          name: Install newman 
-          command: sudo npm install -g newman
-      - run:
-          name: Run Insights Api tests with newman
-          command: |
-            newman run "https://api.getpostman.com/collections/4415288-047f3717-e672-4ca5-9488-cf55caf6579c?apikey="$NEWMAN_API_KEY -e "https://api.getpostman.com/environments/4415288-3f8969a7-c787-4631-b985-6c78a061f17b?apikey="$NEWMAN_API_KEY
   build_docker_image:
     docker:
       - image: circleci/node:12
@@ -128,23 +116,22 @@ workflows:
   build_test:
     jobs:
       - run_tests
-      - insights_api_test
-      # - build_docker_image
-      # - gke_create_cluster
-      # - gke_deploy_app:
-      #     requires:
-      #       - run_tests
-      #       - build_docker_image
-      #       - gke_create_cluster
-      # - smoketest_gke_deployment:
-      #     requires:
-      #       - gke_deploy_app
-      # - approve-destroy:
-      #     type: approval
-      #     requires:
-      #       - gke_create_cluster
-      #       - gke_deploy_app
-      #       - smoketest_gke_deployment
-      # - gke_destroy_cluster:
-      #     requires:
-      #       - approve-destroy
+      - build_docker_image
+      - gke_create_cluster
+      - gke_deploy_app:
+          requires:
+            - run_tests
+            - build_docker_image
+            - gke_create_cluster
+      - smoketest_gke_deployment:
+          requires:
+            - gke_deploy_app
+      - approve-destroy:
+          type: approval
+          requires:
+            - gke_create_cluster
+            - gke_deploy_app
+            - smoketest_gke_deployment
+      - gke_destroy_cluster:
+          requires:
+            - approve-destroy
