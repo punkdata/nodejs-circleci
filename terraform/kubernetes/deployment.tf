@@ -1,4 +1,4 @@
-# resource "kubernetes_deployment" "app" {
+# resource "kubernetes_pod" "example" {
 #   metadata {
 #     name = var.app
 #     labels = {
@@ -7,31 +7,47 @@
 #   }
 
 #   spec {
-#     replicas = 3
+#     container {
+#       image = "example/http-echo:0.1.0"
+#       name  = "example-test"
 
-#     selector {
-#       match_labels = {
-#         app = var.app
-#       }
-#     }
-
-#     template {
-#       metadata {
-#         labels = {
-#           app = var.app
-#         }
-#       }
-
-#       spec {
-#         container {
-#           image = var.docker-image
-#           name  = var.app
-#           port {
-#             name           = "port-5000"
-#             container_port = 5000
-#           }
-#         }
+#       port {
+#         container_port = 80
 #       }
 #     }
 #   }
 # }
+resource "kubernetes_deployment" "app" {
+  metadata {
+    name = var.app
+    labels = {
+      app = var.app
+    }
+  }
+  spec {
+    replicas = 3
+    selector {
+      match_labels = {
+        app = var.app
+      }
+    }
+    template {
+      metadata {
+        labels = {
+          app = var.app
+        }
+      }
+
+      spec {
+        container {
+          image = var.docker-image
+          name  = var.app
+          port {
+            name           = "port-5000"
+            container_port = 5000
+          }
+        }
+      }
+    }
+  }
+}
