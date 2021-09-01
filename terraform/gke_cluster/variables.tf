@@ -1,5 +1,5 @@
 variable "project" {
-  default = "cicd-workshops"
+  default = "cicd-workshops-285017"
 }
 
 variable "region" {
