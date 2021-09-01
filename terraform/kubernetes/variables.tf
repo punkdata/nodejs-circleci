@@ -1,5 +1,5 @@
 variable "cluster" {
-  default = "cicd-workshops"
+  default = "workshop-cicd"
 }
 
 variable "app" {
