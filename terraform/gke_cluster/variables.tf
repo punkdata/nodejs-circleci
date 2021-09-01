@@ -1,5 +1,5 @@
 variable "project" {
-  default = "cicd-workshops-285017"
+  default = "workshop-cicd"
 }
 
 variable "region" {
@@ -11,7 +11,7 @@ variable "zone" {
 }
 
 variable "cluster" {
-  default = "cicd-workshops"
+  default = "workshop-cicd"
 }
 
 variable "credentials" {
