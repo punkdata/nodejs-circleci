@@ -36,7 +36,7 @@ jobs:
     docker:
       - image: ariv3ra/terraform-gcp:latest
     environment:
-      CLOUDSDK_CORE_PROJECT: cicd-workshops
+      CLOUDSDK_CORE_PROJECT: workshop-cicd
     steps:
       - checkout
       - run:
@@ -53,7 +53,7 @@ jobs:
     docker:
       - image: ariv3ra/terraform-gcp:latest
     environment:
-      CLOUDSDK_CORE_PROJECT: cicd-workshops
+      CLOUDSDK_CORE_PROJECT: workshop-cicd
     steps:
       - checkout
       - run:
@@ -93,7 +93,7 @@ jobs:
     docker:
       - image: ariv3ra/terraform-gcp:latest
     environment:
-      CLOUDSDK_CORE_PROJECT: cicd-workshops
+      CLOUDSDK_CORE_PROJECT: workshop-cicd
     steps:
       - checkout
       - run:
