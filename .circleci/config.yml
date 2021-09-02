@@ -38,6 +38,7 @@ jobs:
   create_gke_autopilot:
     environment:
       GOOGLE_PROJECT_ID: workshop-cicd
+      GOOGLE_COMPUTE_ZONE: us-east1-d
     docker:
       - image: ariv3ra/terraform-gcp:latest
     steps:
@@ -50,6 +51,8 @@ jobs:
           autopilot: true
           gcloud-service-key: GCLOUD_SERVICE_KEY
           google-project-id: GOOGLE_PROJECT_ID
+          google-compute-region: GOOGLE_COMPUTE_ZONE
+
 
   gke_create_cluster:
     docker:
