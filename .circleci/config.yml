@@ -50,7 +50,7 @@ jobs:
             echo $GOOGLE_CLOUD_KEYS | base64 -d > $HOME/project/gcloud-service-key.json
             gcloud auth activate-service-account --key-file $HOME/project/gcloud-service-key.json
       - gcp-gke/create-cluster:
-          cluster: gke-autopilot-cicd
+          cluster: $CLUSTER_NAME
           autopilot: true
           gcloud-service-key: GCLOUD_SERVICE_KEY
   deploy_app:
@@ -83,6 +83,18 @@ jobs:
           root: /tmp/gke
           paths:
             - "*"
+  smoketest_gke_deployment:
+    docker:
+      - image: circleci/node:12
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /tmp/gke/
+      - run:
+          name: Smoke Test GKE Deployment
+          command: |
+            source /tmp/gke/gke-endpoint
+            ./test/smoke_test $ENDPOINT
   destroy_gke_cluster:
     environment:
       CLUSTER_NAME: gke-autopilot-cicd
@@ -101,93 +113,12 @@ jobs:
             gcloud container clusters get-credentials $CLUSTER_NAME
       - gcp-gke/delete-cluster:
           cluster: $CLUSTER_NAME
-          
-  gke_create_cluster:
-    docker:
-      - image: ariv3ra/terraform-gcp:latest
-    environment:
-      CLOUDSDK_CORE_PROJECT: workshop-cicd
-    steps:
-      - checkout
-      - run:
-          name: Create GKE Cluster
-          command: |
-            echo $TF_CLOUD_TOKEN | base64 -d > $HOME/.terraformrc
-            echo $GOOGLE_CLOUD_KEYS | base64 -d > $HOME/gcloud_keys
-            gcloud auth activate-service-account --key-file ${HOME}/gcloud_keys
-            cd terraform/gke_cluster/
-            terraform init
-            terraform plan -var credentials=$HOME/gcloud_keys -out=plan.txt
-            terraform apply plan.txt
-  gke_deploy_app:
-    docker:
-      - image: ariv3ra/terraform-gcp:latest
-    environment:
-      CLOUDSDK_CORE_PROJECT: workshop-cicd
-    steps:
-      - checkout
-      - run:
-          name: Deploy App to GKE
-          command: |
-            export CLUSTER_NAME="workshop-cicd"
-            export TAG=0.2.<< pipeline.number >>
-            export DOCKER_IMAGE="docker-image=${DOCKER_LOGIN}/${CIRCLE_PROJECT_REPONAME}:$TAG"
-            echo $TF_CLOUD_TOKEN | base64 -d > $HOME/.terraformrc
-            echo $GOOGLE_CLOUD_KEYS | base64 -d > $HOME/gcloud_keys
-            gcloud auth activate-service-account --key-file ${HOME}/gcloud_keys
-            gcloud container clusters get-credentials $CLUSTER_NAME --zone="us-east1-d"
-            cd terraform/kubernetes
-            terraform init
-            terraform plan -var $DOCKER_IMAGE -out=plan.txt
-            terraform apply plan.txt
-            export ENDPOINT="$(terraform output endpoint)"
-            mkdir -p /tmp/gke/
-            echo 'export ENDPOINT='${ENDPOINT} > /tmp/gke/gke-endpoint
-      - persist_to_workspace:
-          root: /tmp/gke
-          paths:
-            - "*"
-  smoketest_gke_deployment:
-    docker:
-      - image: circleci/node:12
-    steps:
-      - checkout
-      - attach_workspace:
-          at: /tmp/gke/
-      - run:
-          name: Smoke Test GKE Deployment
-          command: |
-            source /tmp/gke/gke-endpoint
-            ./test/smoke_test $ENDPOINT
-  gke_destroy_cluster:
-    docker:
-      - image: ariv3ra/terraform-gcp:latest
-    environment:
-      CLOUDSDK_CORE_PROJECT: workshop-cicd
-    steps:
-      - checkout
-      - run:
-          name: Destroy GKE Cluster
-          command: |
-            export CLUSTER_NAME="workshop-cicd"
-            export TAG=0.2.<< pipeline.number >>
-            export DOCKER_IMAGE="docker-image=${DOCKER_LOGIN}/${CIRCLE_PROJECT_REPONAME}:$TAG"            
-            echo $TF_CLOUD_TOKEN | base64 -d > $HOME/.terraformrc
-            echo $GOOGLE_CLOUD_KEYS | base64 -d > $HOME/gcloud_keys
-            gcloud auth activate-service-account --key-file ${HOME}/gcloud_keys
-            cd terraform/kubernetes
-            terraform init
-            gcloud container clusters get-credentials $CLUSTER_NAME --zone="us-east1-d"            
-            terraform destroy -var $DOCKER_IMAGE --auto-approve
-            cd ../gke_cluster/
-            terraform init
-            terraform destroy -var credentials=$HOME/gcloud_keys --auto-approve
 workflows:
   build_test:
     jobs:
       - run_tests
       - build_docker_image
-      # - create_gke_autopilot
+      - create_gke_autopilot
       - deploy_app:
           requires:
             - build_docker_image
@@ -202,24 +133,3 @@ workflows:
       - destroy_gke_cluster:
           requires:
             - approve-destroy
- 
- 
-
-      # - gke_create_cluster
-      # - gke_deploy_app:
-      #     requires:
-      #       - run_tests
-      #       - build_docker_image
-      #       - gke_create_cluster
-      # - smoketest_gke_deployment:
-      #     requires:
-      #       - gke_deploy_app
-      # - approve-destroy:
-      #     type: approval
-      #     requires:
-      #       - gke_create_cluster
-      #       - gke_deploy_app
-      #       - smoketest_gke_deployment
-      # - gke_destroy_cluster:
-      #     requires:
-      #       - approve-destroy
