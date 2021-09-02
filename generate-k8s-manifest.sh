@@ -2,7 +2,7 @@
 set -o pipefail
 
 APP_NAME=$1 #Name of the app
-IMAGE_NAME=$2 #Name of Docker Image
+IMAGE_NAME=$2 #Tag for image
 
 cat << EOF > k8s-deployment.yaml
 ---
@@ -25,9 +25,27 @@ spec:
     spec:
       containers:
       - name: "$APP_NAME"
-        image: "ariv3ra/$IMAGE_NAME"
-        ports:
-        - containerPort: 5000
+        image: "$IMAGE_NAME"
+---
+apiVersion: "autoscaling/v2beta1"
+kind: "HorizontalPodAutoscaler"
+metadata:
+  name: "$APP_NAME-hpa-ndyl"
+  namespace: "default"
+  labels:
+    app: "$APP_NAME"
+spec:
+  scaleTargetRef:
+    kind: "Deployment"
+    name: "$APP_NAME"
+    apiVersion: "apps/v1"
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: "Resource"
+    resource:
+      name: "cpu"
+      targetAverageUtilization: 80
 ---
 apiVersion: "v1"
 kind: "Service"

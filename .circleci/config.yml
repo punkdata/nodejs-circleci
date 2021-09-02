@@ -164,13 +164,14 @@ workflows:
   build_test:
     jobs:
       - run_tests
+      - build_docker_image
       # - create_gke_autopilot
       - deploy_app
  
  
  
  
-      # - build_docker_image
+
       # - gke_create_cluster
       # - gke_deploy_app:
       #     requires:
