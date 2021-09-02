@@ -38,9 +38,7 @@ jobs:
   create_gke_autopilot:
     environment:
       CLOUDSDK_CORE_PROJECT: workshop-cicd
-      # CLOUDSDK_COMPUTE_ZONE: us-east1-d
-      CLOUDSDK_COMPUTE_REGION: us-east1
-
+      CLOUDSDK_COMPUTE_REGION: us-central1
     docker:
       - image: ariv3ra/terraform-gcp:latest
     steps:
@@ -49,11 +47,9 @@ jobs:
           echo $GOOGLE_CLOUD_KEYS | base64 -d > $HOME/project/gcloud-service-key.json
           gcloud auth activate-service-account --key-file $HOME/project/gcloud-service-key.json
       - gcp-gke/create-cluster:
-          cluster: gke-autopilot-demo
+          cluster: gke-autopilot-cicd
           autopilot: true
           gcloud-service-key: GCLOUD_SERVICE_KEY
-          # google-project-id: CLOUDSDK_CORE_PROJECT
-          # google-compute-region: CLOUDSDK_COMPUTE_ZONE
 
   gke_create_cluster:
     docker:
