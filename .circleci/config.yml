@@ -48,7 +48,7 @@ jobs:
           gcloud auth activate-service-account --key-file $HOME/project/gcloud-service-key.json
       - gcp-gke/create-cluster:
           cluster: gke-autopilot-demo
-          autopilot: true
+          autopilot: false
           gcloud-service-key: GCLOUD_SERVICE_KEY
           google-project-id: GOOGLE_PROJECT_ID
           google-compute-region: GOOGLE_COMPUTE_ZONE
