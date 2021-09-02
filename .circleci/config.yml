@@ -41,7 +41,7 @@ jobs:
     executor: gcp-gke/default
     steps:
       - checkout
-      - run: echo $GOOGLE_CLOUD_KEYS | base64 -d > $HOME/gcloud_keys
+      - run: echo $GOOGLE_CLOUD_KEYS | base64 -d > $HOME/gcloud-service-key.json
       - gcp-gke/create-cluster:
           cluster: gke-autopilot-demo
           autopilot: true
