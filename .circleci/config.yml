@@ -46,7 +46,7 @@ jobs:
       - gcp-gke/create-cluster:
           cluster: gke-autopilot-demo
           autopilot: true
-          gcloud-service-key: GOOGLE_CLOUD_KEYS
+          # gcloud-service-key: GOOGLE_CLOUD_KEYS
           google-project-id: GOOGLE_PROJECT_ID
 
   gke_create_cluster:
