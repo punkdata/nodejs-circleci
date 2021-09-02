@@ -26,26 +26,8 @@ spec:
       containers:
       - name: "$APP_NAME"
         image: "$IMAGE_NAME"
----
-apiVersion: "autoscaling/v2beta1"
-kind: "HorizontalPodAutoscaler"
-metadata:
-  name: "$APP_NAME-hpa-ndyl"
-  namespace: "default"
-  labels:
-    app: "$APP_NAME"
-spec:
-  scaleTargetRef:
-    kind: "Deployment"
-    name: "$APP_NAME"
-    apiVersion: "apps/v1"
-  minReplicas: 1
-  maxReplicas: 5
-  metrics:
-  - type: "Resource"
-    resource:
-      name: "cpu"
-      targetAverageUtilization: 80
+        ports:
+        - containerPort: 5000
 ---
 apiVersion: "v1"
 kind: "Service"
