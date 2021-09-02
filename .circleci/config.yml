@@ -39,6 +39,8 @@ jobs:
     environment:
       CLOUDSDK_CORE_PROJECT: workshop-cicd
       CLOUDSDK_COMPUTE_ZONE: us-east1-d
+      CLOUDSDK_COMPUTE_REGION: us-east1
+
     docker:
       - image: ariv3ra/terraform-gcp:latest
     steps:
