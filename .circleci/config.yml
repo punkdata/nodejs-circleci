@@ -42,13 +42,14 @@ jobs:
       - image: ariv3ra/terraform-gcp:latest
     steps:
       - checkout
-      # - run: export GCLOUD_SERVICE_KEY=$(echo $GOOGLE_CLOUD_KEYS | base64 -d > $HOME/gcloud-service-key.json)
+      - run: 
+          echo $GOOGLE_CLOUD_KEYS | base64 -d > $HOME/project/gcloud-service-key.json
+          gcloud auth activate-service-account --key-file $HOME/project/gcloud-service-key.json
       - gcp-gke/create-cluster:
           cluster: gke-autopilot-demo
           autopilot: true
           gcloud-service-key: GCLOUD_SERVICE_KEY
           google-project-id: GOOGLE_PROJECT_ID
-          perform-login: true
 
   gke_create_cluster:
     docker:
