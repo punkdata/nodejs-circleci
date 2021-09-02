@@ -1,6 +1,3 @@
-#!/bin/bash 
-set -o pipefail
-
 APP_NAME=$1 #Name of the app
 IMAGE_NAME=$2 #Tag for image
 
