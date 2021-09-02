@@ -36,6 +36,8 @@ jobs:
             echo $DOCKER_PWD | docker login -u $DOCKER_LOGIN --password-stdin
             docker push $DOCKER_LOGIN/$IMAGE_NAME
   create_gke_autopilot:
+    environment:
+      GOOGLE_PROJECT_ID: workshop-cicd
     executor: gcp-gke/default
     steps:
       - checkout
@@ -43,7 +45,7 @@ jobs:
           cluster: gke-autopilot-demo
           autopilot: true
           gcloud-service-key: GOOGLE_CLOUD_KEYS
-          google-project-id: workshop-cicd
+          google-project-id: GOOGLE_PROJECT_ID
 
 
   gke_create_cluster:
