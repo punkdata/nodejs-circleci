@@ -43,13 +43,40 @@ jobs:
       - image: ariv3ra/terraform-gcp:latest
     steps:
       - checkout
-      - run: |
-          echo $GOOGLE_CLOUD_KEYS | base64 -d > $HOME/project/gcloud-service-key.json
-          gcloud auth activate-service-account --key-file $HOME/project/gcloud-service-key.json
+      - run: 
+          no_output_timeout: 15m
+          command: |
+            echo $GOOGLE_CLOUD_KEYS | base64 -d > $HOME/project/gcloud-service-key.json
+            gcloud auth activate-service-account --key-file $HOME/project/gcloud-service-key.json
       - gcp-gke/create-cluster:
           cluster: gke-autopilot-cicd
           autopilot: true
           gcloud-service-key: GCLOUD_SERVICE_KEY
+  deploy_app:
+    environment:
+      CLUSTER_NAME: gke-autopilot-cicd
+      CLOUDSDK_CORE_PROJECT: workshop-cicd
+      CLOUDSDK_COMPUTE_REGION: us-central1
+    docker:
+      - image: ariv3ra/terraform-gcp:latest
+    steps:
+      - checkout
+      - run: 
+          no_output_timeout: 15m
+          name: Generate K8S Deployment manifest
+          command: |
+            export TAG=0.2.<< pipeline.number >>
+            export IMAGE_NAME=$CIRCLE_PROJECT_REPONAME
+            export DOCKER_IMAGE=$DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME:$TAG"
+            export APP_NAME=$CIRCLE_PROJECT_REPONAME
+            echo $GOOGLE_CLOUD_KEYS | base64 -d > $HOME/project/gcloud-service-key.json
+            gcloud auth activate-service-account --key-file $HOME/project/gcloud-service-key.json
+            gcloud container clusters get-credentials $CLUSTER_NAME --zone="us-east1-d"
+            ./generate-k8s-manifest.sh $CIRCLECI_PROJECT_REPONAME $DOCKER_IMAGE
+      - kubernetes/create-or-update-resource:
+          resource-file-path: "k8s-deployment.yaml"
+          get-rollout-status: true
+          resource-name: deployment/$APP_NAME
 
   gke_create_cluster:
     docker:
@@ -135,7 +162,12 @@ workflows:
   build_test:
     jobs:
       - run_tests
-      - create_gke_autopilot
+      # - create_gke_autopilot
+      - deploy_app
+ 
+ 
+ 
+ 
       # - build_docker_image
       # - gke_create_cluster
       # - gke_deploy_app:
