@@ -74,10 +74,11 @@ jobs:
             gcloud container clusters get-credentials $CLUSTER_NAME
             pwd
             sh ~/project/generate-k8s-manifest.sh $CIRCLECI_PROJECT_REPONAME $DOCKER_IMAGE
-      - kubernetes/create-or-update-resource:
-          resource-file-path: "k8s-deployment.yaml"
-          get-rollout-status: true
-          resource-name: deployment/$APP_NAME
+            kubectl apply -f k8s-deployment.yaml
+      # - kubernetes/create-or-update-resource:
+      #     resource-file-path: "k8s-deployment.yaml"
+      #     get-rollout-status: true
+      #     # resource-name: deployment/$APP_NAME
 
   gke_create_cluster:
     docker:
