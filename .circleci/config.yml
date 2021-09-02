@@ -67,7 +67,7 @@ jobs:
           command: |
             export TAG=0.2.<< pipeline.number >>
             export IMAGE_NAME=$CIRCLE_PROJECT_REPONAME
-            export DOCKER_IMAGE=$DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME:$TAG"
+            export DOCKER_IMAGE=$DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME:$TAG
             export APP_NAME=$CIRCLE_PROJECT_REPONAME
             echo $GOOGLE_CLOUD_KEYS | base64 -d > $HOME/project/gcloud-service-key.json
             gcloud auth activate-service-account --key-file $HOME/project/gcloud-service-key.json
