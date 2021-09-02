@@ -12,19 +12,19 @@ metadata:
   name: "$APP_NAME"
   namespace: "default"
   labels:
-    app: $APP_NAME
+    app: "$APP_NAME"
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: $APP_NAME
+      app: "$APP_NAME"
   template:
     metadata:
       labels:
-        app: $APP_NAME
+        app: "$APP_NAME"
     spec:
       containers:
-      - name: $APP_NAME
+      - name: "$APP_NAME"
         image: "$IMAGE_NAME"
 ---
 apiVersion: "autoscaling/v2beta1"
@@ -33,11 +33,11 @@ metadata:
   name: "$APP_NAME-hpa-ndyl"
   namespace: "default"
   labels:
-    app: $APP_NAME
+    app: "$APP_NAME"
 spec:
   scaleTargetRef:
     kind: "Deployment"
-    name: $APP_NAME
+    name: "$APP_NAME"
     apiVersion: "apps/v1"
   minReplicas: 1
   maxReplicas: 5
@@ -53,14 +53,14 @@ metadata:
   name: "$APP_NAME-service"
   namespace: "default"
   labels:
-    app: $APP_NAME
+    app: "$APP_NAME"
 spec:
   ports:
   - protocol: "TCP"
     port: 80
     targetPort: 5000
   selector:
-    app: $APP_NAME
+    app: "$APP_NAME"
   type: "LoadBalancer"
   loadBalancerIP: ""
 EOF
