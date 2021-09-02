@@ -71,7 +71,7 @@ jobs:
             export APP_NAME=$CIRCLE_PROJECT_REPONAME
             echo $GOOGLE_CLOUD_KEYS | base64 -d > $HOME/project/gcloud-service-key.json
             gcloud auth activate-service-account --key-file $HOME/project/gcloud-service-key.json
-            gcloud container clusters get-credentials $CLUSTER_NAME --zone="us-east1-d"
+            gcloud container clusters get-credentials $CLUSTER_NAME
             ./generate-k8s-manifest.sh $CIRCLECI_PROJECT_REPONAME $DOCKER_IMAGE
       - kubernetes/create-or-update-resource:
           resource-file-path: "k8s-deployment.yaml"
