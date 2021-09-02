@@ -2,7 +2,7 @@
 set -o pipefail
 
 APP_NAME=$1 #Name of the app
-IMAGE_NAME=$2 #Tag for image
+IMAGE_NAME=$2 #Name of Docker Image
 
 cat << EOF > k8s-deployment.yaml
 ---
@@ -25,7 +25,7 @@ spec:
     spec:
       containers:
       - name: "$APP_NAME"
-        image: "$IMAGE_NAME"
+        image: "ariv3ra/$IMAGE_NAME"
         ports:
         - containerPort: 5000
 ---

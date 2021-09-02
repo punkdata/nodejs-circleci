@@ -66,14 +66,14 @@ jobs:
           name: Generate K8S Deployment manifest
           command: |
             export TAG=0.2.<< pipeline.number >>
-            export IMAGE_NAME=$CIRCLE_PROJECT_REPONAME
+            export IMAGE_NAME=$CIRCLE_PROJECT_REPONAME:$TAG
             export DOCKER_IMAGE=$DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME:$TAG
             export APP_NAME=$CIRCLE_PROJECT_REPONAME
             echo $GOOGLE_CLOUD_KEYS | base64 -d > $HOME/project/gcloud-service-key.json
             gcloud auth activate-service-account --key-file $HOME/project/gcloud-service-key.json
             gcloud container clusters get-credentials $CLUSTER_NAME
             pwd
-            sh ~/project/generate-k8s-manifest.sh ${CIRCLECI_PROJECT_REPONAME} ${$DOCKER_IMAGE}
+            sh ~/project/generate-k8s-manifest.sh ${CIRCLECI_PROJECT_REPONAME} ${IMAGE_NAME}
             kubectl apply -f k8s-deployment.yaml
       # - kubernetes/create-or-update-resource:
       #     resource-file-path: "k8s-deployment.yaml"
