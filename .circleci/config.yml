@@ -73,7 +73,7 @@ jobs:
             gcloud auth activate-service-account --key-file $HOME/project/gcloud-service-key.json
             gcloud container clusters get-credentials $CLUSTER_NAME
             pwd
-            sh ~/project/generate-k8s-manifest.sh $CIRCLE_PROJECT_REPONAME $DOCKER_IMAGE_NAME
+            sh ~/project/generate-k8s-manifest.sh $CIRCLE_PROJECT_REPONAME $DOCKER_IMAGE
             cat k8s-deployment.yaml
             kubectl apply -f k8s-deployment.yaml
       # - kubernetes/create-or-update-resource:
