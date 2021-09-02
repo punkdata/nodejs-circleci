@@ -166,7 +166,9 @@ workflows:
       - run_tests
       - build_docker_image
       # - create_gke_autopilot
-      - deploy_app
+      - deploy_app:
+          requires:
+            - build_docker_image
  
  
  
