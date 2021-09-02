@@ -1,4 +1,7 @@
 version: 2.1
+orbs:
+  gcp-gke: circleci/gcp-gke@1.3.0
+  kubernetes: circleci/kubernetes@0.11.0
 jobs:
   run_tests:
     docker:
@@ -32,6 +35,17 @@ jobs:
             docker build -t $DOCKER_LOGIN/$IMAGE_NAME -t $DOCKER_LOGIN/$IMAGE_NAME:$TAG .
             echo $DOCKER_PWD | docker login -u $DOCKER_LOGIN --password-stdin
             docker push $DOCKER_LOGIN/$IMAGE_NAME
+  create_gke_autopilot:
+    executor: gcp-gke/default
+    steps:
+      - checkout
+      - gcp-gke:
+          cluster: gke-autopilot-demo
+          autopilot: true
+          gcloud-service-key: GOOGLE_CLOUD_KEYS
+          google-project-id: workshop-cicd
+
+
   gke_create_cluster:
     docker:
       - image: ariv3ra/terraform-gcp:latest
@@ -116,22 +130,23 @@ workflows:
   build_test:
     jobs:
       - run_tests
-      - build_docker_image
-      - gke_create_cluster
-      - gke_deploy_app:
-          requires:
-            - run_tests
-            - build_docker_image
-            - gke_create_cluster
-      - smoketest_gke_deployment:
-          requires:
-            - gke_deploy_app
-      - approve-destroy:
-          type: approval
-          requires:
-            - gke_create_cluster
-            - gke_deploy_app
-            - smoketest_gke_deployment
-      - gke_destroy_cluster:
-          requires:
-            - approve-destroy
+      - create_gke_autopilot
+      # - build_docker_image
+      # - gke_create_cluster
+      # - gke_deploy_app:
+      #     requires:
+      #       - run_tests
+      #       - build_docker_image
+      #       - gke_create_cluster
+      # - smoketest_gke_deployment:
+      #     requires:
+      #       - gke_deploy_app
+      # - approve-destroy:
+      #     type: approval
+      #     requires:
+      #       - gke_create_cluster
+      #       - gke_deploy_app
+      #       - smoketest_gke_deployment
+      # - gke_destroy_cluster:
+      #     requires:
+      #       - approve-destroy
