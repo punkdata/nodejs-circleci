@@ -39,7 +39,7 @@ jobs:
     executor: gcp-gke/default
     steps:
       - checkout
-      - gcp-gke:
+      - gcp-gke/create-cluster:
           cluster: gke-autopilot-demo
           autopilot: true
           gcloud-service-key: GOOGLE_CLOUD_KEYS
