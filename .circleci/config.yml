@@ -1,22 +1,39 @@
 version: 2.1
+orbs:
+  node: circleci/node@4.2.0
+  docker: circleci/docker@1.5.0
+  gcp-cli: circleci/gcp-cli@2.4.1
+  terraform: circleci/terraform@3.0.0
 jobs:
   run_tests:
     docker:
-      - image: circleci/node:12
+      - image: cimg/node:14.16.0
     steps:
       - checkout
-      - run:
-          name: Install npm dependencies
-          command: |
-            npm install --save
+      - node/install-packages:
+          override-ci-command: npm install
+          cache-path: ~/project/node_modules
       - run:
           name: Run Unit Tests
           command: |
+            ./node_modules/mocha/bin/mocha test/ --reporter mocha-junit-reporter --reporter-options mochaFile=./test/test-results.xml
             ./node_modules/mocha/bin/mocha test/ --reporter mochawesome --reporter-options reportDir=test-results,reportFilename=test-results
       - store_test_results:
-          path: test-results
+          path: test/
       - store_artifacts:
           path: test-results
+  build_docker_image:
+    docker:
+      - image: cimg/node:14.16.0
+    steps:
+      - checkout  
+      - docker/check
+      - docker/build:
+          image: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME
+          tag: 0.1.<< pipeline.number >>
+      - docker/push:
+          image: $DOCKER_LOGIN/$CIRCLE_PROJECT_REPONAME
+          tag: 0.1.<< pipeline.number >>
   # insights_api_test:
   #   docker:
   #     - image: circleci/node:12
@@ -29,28 +46,19 @@ jobs:
   #         name: Run Insights Api tests with newman
   #         command: |
   #           newman run "https://api.getpostman.com/collections/4415288-047f3717-e672-4ca5-9488-cf55caf6579c?apikey="$NEWMAN_API_KEY -e "https://api.getpostman.com/environments/4415288-3f8969a7-c787-4631-b985-6c78a061f17b?apikey="$NEWMAN_API_KEY
-  build_docker_image:
-    docker:
-      - image: circleci/node:12
-    steps:
-      - checkout
-      - setup_remote_docker:
-          docker_layer_caching: false
-      - run:
-          name: Build Docker image
-          command: |
-            export TAG=0.2.<< pipeline.number >>
-            export IMAGE_NAME=$CIRCLE_PROJECT_REPONAME
-            docker build -t $DOCKER_LOGIN/$IMAGE_NAME -t $DOCKER_LOGIN/$IMAGE_NAME:$TAG .
-            echo $DOCKER_PWD | docker login -u $DOCKER_LOGIN --password-stdin
-            docker push $DOCKER_LOGIN/$IMAGE_NAME
+
   gke_create_cluster:
     docker:
-      - image: ariv3ra/terraform-gcp:latest
+      - image: cimg/node:14.16.0
     environment:
       CLOUDSDK_CORE_PROJECT: cicd-workshops
     steps:
       - checkout
+      - gcp-cli/install
+      - terraform/install:
+          terraform_version: "0.12.0"
+          arch: "amd64"
+          os: "linux"
       - run:
           name: Create GKE Cluster
           command: |
@@ -63,11 +71,16 @@ jobs:
             terraform apply plan.txt
   gke_deploy_app:
     docker:
-      - image: ariv3ra/terraform-gcp:latest
+      - image: cimg/node:14.16.0
     environment:
       CLOUDSDK_CORE_PROJECT: cicd-workshops
     steps:
       - checkout
+      - gcp-cli/install
+      - terraform/install:
+          terraform_version: "0.12.0"
+          arch: "amd64"
+          os: "linux"
       - run:
           name: Deploy App to GKE
           command: |
@@ -91,7 +104,7 @@ jobs:
             - "*"
   smoketest_gke_deployment:
     docker:
-      - image: circleci/node:12
+      - image: cimg/node:14.16.0
     steps:
       - checkout
       - attach_workspace:
@@ -103,11 +116,16 @@ jobs:
             ./test/smoke_test $ENDPOINT
   gke_destroy_cluster:
     docker:
-      - image: ariv3ra/terraform-gcp:latest
+      - image: cimg/node:14.16.0
     environment:
       CLOUDSDK_CORE_PROJECT: cicd-workshops
     steps:
       - checkout
+      - gcp-cli/install
+      - terraform/install:
+          terraform_version: "0.12.0"
+          arch: "amd64"
+          os: "linux"
       - run:
           name: Destroy GKE Cluster
           command: |
